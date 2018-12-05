@@ -82,7 +82,7 @@ func computeLotteryNumbers(onlineCount int) []int {
 func computeLotteryIssue() string {
 	currentTime := time.Now()
 
-	nSequence := currentTime.Hour()*60 + currentTime.Minute()
+	nSequence := (currentTime.Hour() * 60) + currentTime.Minute()
 	if nSequence == 0 {
 		nSequence = 1440
 		yesTime := currentTime.AddDate(0, 0, -1)
@@ -129,14 +129,14 @@ func writeToFile(strLotteryName string, lotteryData LotteryData) {
 
 	exist, err := pathExists(strFilePath)
 	if err != nil {
-		fmt.Printf("get dir error![%v]\n", err)
+		log.Println("get dir error![%v]", err)
 		return
 	}
 
 	if !exist {
 		err := os.Mkdir(strFilePath, os.ModePerm)
 		if err != nil {
-			fmt.Printf("mkdir failed![%v]\n", err)
+			log.Println("mkdir failed![%v]", err)
 		}
 	}
 
@@ -145,7 +145,7 @@ func writeToFile(strLotteryName string, lotteryData LotteryData) {
 	strFileName := fmt.Sprintf("%s%4d-%02d-%02d.txt", strFilePath, t.Year(), t.Month(), t.Day())
 	file, err := os.OpenFile(strFileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	defer file.Close()
 
@@ -163,7 +163,7 @@ func writeToFile(strLotteryName string, lotteryData LotteryData) {
 		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 
 	if _, err = file.WriteString(strText); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 
@@ -173,12 +173,15 @@ func fetchTotalOnlineData(url string) TotalOnlineData {
 
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return data
 	}
 
 	htmlText := doc.Text()
 	//fmt.Println("html response text:", htmlText)
+	if len(htmlText) < 12 {
+		return data
+	}
 
 	strJSON := htmlText[12 : len(htmlText)-1]
 	//fmt.Println(strJSON)
@@ -186,7 +189,7 @@ func fetchTotalOnlineData(url string) TotalOnlineData {
 	// 解析json
 	err = json.Unmarshal([]byte(strJSON), &data)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return data
 	}
 	//fmt.Println(data)
@@ -230,7 +233,7 @@ func fetchCityOnlineData(url string) CityOnlineData {
 
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return data
 	}
 
@@ -240,7 +243,7 @@ func fetchCityOnlineData(url string) CityOnlineData {
 	// 解析json
 	err = json.Unmarshal([]byte(htmlText), &data)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err, htmlText)
 		return data
 	}
 	//fmt.Println(data)
