@@ -24,7 +24,7 @@ func pathExists(path string) (bool, error) {
 
 // WriteToFile 写入文件
 func WriteToFile(strLotteryName string, lotteryData lottery.Data) {
-	strFilePath := fmt.Sprintf("./%s/", strLotteryName)
+	strFilePath := fmt.Sprintf("./db/%s/", strLotteryName)
 
 	exist, err := pathExists(strFilePath)
 	if err != nil {
